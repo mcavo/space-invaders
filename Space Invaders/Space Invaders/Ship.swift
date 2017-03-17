@@ -6,4 +6,8 @@
 //  Copyright © 2017 María Victoria Cavo. All rights reserved.
 //
 
-import Foundation
+import SpriteKit
+
+class Ship: SKNode {
+
+}
