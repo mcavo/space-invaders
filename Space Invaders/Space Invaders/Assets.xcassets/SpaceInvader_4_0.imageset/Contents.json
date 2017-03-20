@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "SpaceInvader_1_1.png",
+      "filename" : "SpaceInvader_4_0.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "SpaceInvader_1_1@2x.png",
+      "filename" : "SpaceInvader_4_0@2x.png",
       "scale" : "2x"
     },
     {

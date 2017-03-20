@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		38403C001E7C30610026C1B3 /* Ship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38403BFF1E7C30610026C1B3 /* Ship.swift */; };
+		3888F8E11E7E205400BC6766 /* StartScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3888F8E01E7E205400BC6766 /* StartScene.swift */; };
 		38BC06501E7BABC800385F77 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BC064F1E7BABC800385F77 /* AppDelegate.swift */; };
 		38BC06561E7BABC800385F77 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BC06551E7BABC800385F77 /* GameScene.swift */; };
 		38BC06581E7BABC800385F77 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BC06571E7BABC800385F77 /* GameViewController.swift */; };
@@ -15,10 +16,14 @@
 		38BC065D1E7BABC800385F77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38BC065C1E7BABC800385F77 /* Assets.xcassets */; };
 		38BC06601E7BABC800385F77 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38BC065E1E7BABC800385F77 /* LaunchScreen.storyboard */; };
 		38BC06681E7C0D9900385F77 /* SpaceInvader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BC06671E7C0D9900385F77 /* SpaceInvader.swift */; };
+		38FDAC481E7F76A700D85EA2 /* SpaceInvader_1.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAC471E7F76A700D85EA2 /* SpaceInvader_1.atlas */; };
+		38FDAC4A1E7F76AF00D85EA2 /* SpaceInvader_2.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAC491E7F76AF00D85EA2 /* SpaceInvader_2.atlas */; };
+		38FDAC4C1E7F76D400D85EA2 /* SpaceInvader_3.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAC4B1E7F76D400D85EA2 /* SpaceInvader_3.atlas */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		38403BFF1E7C30610026C1B3 /* Ship.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ship.swift; sourceTree = "<group>"; };
+		3888F8E01E7E205400BC6766 /* StartScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartScene.swift; sourceTree = "<group>"; };
 		38BC064C1E7BABC800385F77 /* Space Invaders.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Space Invaders.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		38BC064F1E7BABC800385F77 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		38BC06551E7BABC800385F77 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -28,6 +33,9 @@
 		38BC065F1E7BABC800385F77 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		38BC06611E7BABC800385F77 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		38BC06671E7C0D9900385F77 /* SpaceInvader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceInvader.swift; sourceTree = "<group>"; };
+		38FDAC471E7F76A700D85EA2 /* SpaceInvader_1.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = SpaceInvader_1.atlas; sourceTree = "<group>"; };
+		38FDAC491E7F76AF00D85EA2 /* SpaceInvader_2.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = SpaceInvader_2.atlas; sourceTree = "<group>"; };
+		38FDAC4B1E7F76D400D85EA2 /* SpaceInvader_3.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = SpaceInvader_3.atlas; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,12 +69,16 @@
 			isa = PBXGroup;
 			children = (
 				38BC064F1E7BABC800385F77 /* AppDelegate.swift */,
+				3888F8E01E7E205400BC6766 /* StartScene.swift */,
 				38BC06551E7BABC800385F77 /* GameScene.swift */,
 				38BC06571E7BABC800385F77 /* GameViewController.swift */,
 				38BC06591E7BABC800385F77 /* Main.storyboard */,
 				38BC065C1E7BABC800385F77 /* Assets.xcassets */,
-				38BC065E1E7BABC800385F77 /* LaunchScreen.storyboard */,
+				38FDAC4B1E7F76D400D85EA2 /* SpaceInvader_3.atlas */,
+				38FDAC491E7F76AF00D85EA2 /* SpaceInvader_2.atlas */,
+				38FDAC471E7F76A700D85EA2 /* SpaceInvader_1.atlas */,
 				38BC06611E7BABC800385F77 /* Info.plist */,
+				38BC065E1E7BABC800385F77 /* LaunchScreen.storyboard */,
 				38BC06671E7C0D9900385F77 /* SpaceInvader.swift */,
 				38403BFF1E7C30610026C1B3 /* Ship.swift */,
 			);
@@ -132,8 +144,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38FDAC481E7F76A700D85EA2 /* SpaceInvader_1.atlas in Resources */,
+				38FDAC4A1E7F76AF00D85EA2 /* SpaceInvader_2.atlas in Resources */,
 				38BC065B1E7BABC800385F77 /* Main.storyboard in Resources */,
 				38BC065D1E7BABC800385F77 /* Assets.xcassets in Resources */,
+				38FDAC4C1E7F76D400D85EA2 /* SpaceInvader_3.atlas in Resources */,
 				38BC06601E7BABC800385F77 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -146,6 +161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				38BC06561E7BABC800385F77 /* GameScene.swift in Sources */,
+				3888F8E11E7E205400BC6766 /* StartScene.swift in Sources */,
 				38BC06581E7BABC800385F77 /* GameViewController.swift in Sources */,
 				38BC06681E7C0D9900385F77 /* SpaceInvader.swift in Sources */,
 				38BC06501E7BABC800385F77 /* AppDelegate.swift in Sources */,
