@@ -10,7 +10,10 @@ import SpriteKit
 
 class Projectile : SKSpriteNode {
     
-    init(imageNamed: String) {
+    var direction : Int = 1
+    
+    init(imageNamed: String, direction: Int) {
+        self.direction = direction
         let imageTexture = SKTexture(imageNamed: imageNamed)
         super.init(texture: imageTexture, color: UIColor.clear, size: imageTexture.size())
         self.physicsBody = SKPhysicsBody(rectangleOf: imageTexture.size())

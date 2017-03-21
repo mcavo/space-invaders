@@ -27,7 +27,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kScoreName = "Score"
     var kScore : Int = 0
     
-    let kProjectileVelocity = CGVector(dx: 0, dy: 100)
+    let kProjectileVelocity = 200
     
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black
@@ -51,9 +51,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func updateProjectiles() {
         self.enumerateChildNodes(withName: "Projectile") {
             node, stop in
-            node.physicsBody!.velocity = self.kProjectileVelocity
-            if node.position.y > self.size.height - 2 * node.frame.size.height {
-                node.removeFromParent()
+            if let projectile = node as? Projectile {
+                projectile.physicsBody!.velocity = CGVector(dx: 0, dy: self.kProjectileVelocity * projectile.direction)
+                if projectile.position.y > self.size.height - 2 * projectile.frame.size.height {
+                    projectile.removeFromParent()
+                }
             }
         }
         
@@ -92,7 +94,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func addProjectile() {
         if let ship = childNode(withName: kShipName) {
-            let projectile = Projectile(imageNamed: "Projectile")
+            let projectile = Projectile(imageNamed: "Projectile", direction: 1)
             projectile.position = CGPoint(x: ship.position.x, y: ship.position.y + ship.frame.size.height * 0.5 + projectile.size.height)
             projectile.name = "Projectile"
             projectile.physicsBody?.categoryBitMask = PhysicsCategory.Projectile
