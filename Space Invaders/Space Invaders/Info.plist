@@ -32,11 +32,6 @@
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
-	<key>LSEnvironment</key>
-	<dict>
-		<key>SpaceInvadersRows</key>
-		<integer>8</integer>
-	</dict>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
