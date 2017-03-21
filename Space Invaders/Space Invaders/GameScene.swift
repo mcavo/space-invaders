@@ -25,6 +25,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kShipName = "SpaceShip"
     let kSpaceInvaderName = "SpaceInvader"
     let kScoreName = "Score"
+    var kScore : Int = 0
     
     let kProjectileVelocity = CGVector(dx: 0, dy: 100)
     
@@ -38,11 +39,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // *****
         motionManager.startAccelerometerUpdates()
         // *****
-        }
+        setupScore()
+    }
     
     override func update(_ currentTime: TimeInterval) {
         processSpaceShipMotion(forUpdate: currentTime)
         updateProjectiles()
+        updateScore()
     }
     
     func updateProjectiles() {
@@ -60,6 +63,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     ship.physicsBody!.applyForce(CGVector(dx: 10 * CGFloat(data.acceleration.x), dy: 0))
                 }
             }
+        }
+    }
+    
+    func updateScore() {
+        if let scoreLabel = childNode(withName: kScoreName) as? SKLabelNode {
+            scoreLabel.text = String(format: "SCORE: %06u", kScore)
+            scoreLabel.position = CGPoint(
+                x: frame.size.width * 0.1 + scoreLabel.frame.size.width * 0.5,
+                y: size.height - (40 + scoreLabel.frame.size.height/2)
+            )
         }
     }
     
@@ -91,21 +104,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func addSpaceInvaders() {
-        populateRow(atlasName:"SpaceInvader_1", row: 0)
-        populateRow(atlasName:"SpaceInvader_1", row: 1)
-        populateRow(atlasName:"SpaceInvader_2", row: 2)
-        populateRow(atlasName:"SpaceInvader_2", row: 3)
-        populateRow(atlasName:"SpaceInvader_3", row: 4)
+        populateRow(atlasName:"SpaceInvader_1", points: 10, row: 0)
+        populateRow(atlasName:"SpaceInvader_1", points: 10, row: 1)
+        populateRow(atlasName:"SpaceInvader_2", points: 20, row: 2)
+        populateRow(atlasName:"SpaceInvader_2", points: 20, row: 3)
+        populateRow(atlasName:"SpaceInvader_3", points: 30, row: 4)
     }
     
-    func populateRow(atlasName: String, row: Int) {
+    func populateRow(atlasName: String, points: Int, row: Int) {
         
         let delta = 0.75 * Double((spaceInvadersPerRow+1) % 2)
         let percentage = -(ceil(Double(spaceInvadersPerRow)/2.0 - 1) * 1.5 + delta)
         
         for inv in 0..<spaceInvadersPerRow {
             let frames = getSKTextureArrayFromAtlasName(atlasName: atlasName)
-            let invader = SpaceInvader(imageTexture: frames[0])
+            let invader = SpaceInvader(imageTexture: frames[0], points: points)
             let positionX = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(inv)) * Double(invader.size.width))
             let positionY = CGFloat(Double(size.height * 0.6) + Double(row) * 1.5 * Double(invader.size.height))
             invader.position = CGPoint(x: positionX, y: positionY)
@@ -150,16 +163,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addProjectile()
     }
     
-    func projectileDidCollideWithInvader(projectile: SKSpriteNode, invader: SKSpriteNode) {
-        // TODO: Add Score
-        print("Hit")
+    func projectileDidCollideWithInvader(projectile: Projectile, invader: SpaceInvader) {
+        kScore += invader.points
         projectile.removeFromParent()
         invader.removeFromParent()
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
-        
-        // 1
         var firstBody: SKPhysicsBody
         var secondBody: SKPhysicsBody
         if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
@@ -169,16 +179,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             firstBody = contact.bodyB
             secondBody = contact.bodyA
         }
-        
-        // 2
         if ((firstBody.categoryBitMask & PhysicsCategory.Invader != 0) &&
             (secondBody.categoryBitMask & PhysicsCategory.Projectile != 0)) {
-            if let invader = firstBody.node as? SKSpriteNode, let
-                projectile = secondBody.node as? SKSpriteNode {
+            if let invader = firstBody.node as? SpaceInvader, let
+                projectile = secondBody.node as? Projectile {
                 projectileDidCollideWithInvader(projectile: projectile, invader: invader)
             }
         }
         
+    }
+    
+    
+    func setupScore() {
+        let scoreLabel = SKLabelNode(fontNamed: "PressStartK")
+        scoreLabel.name = kScoreName
+        scoreLabel.fontSize = 12
+        scoreLabel.fontColor = SKColor.white
+        scoreLabel.text = String(format: "SCORE: %06u", kScore)
+        scoreLabel.position = CGPoint(
+            x: frame.size.width * 0.1 + scoreLabel.frame.size.width * 0.5,
+            y: size.height - (40 + scoreLabel.frame.size.height/2)
+        )
+        addChild(scoreLabel)
     }
     
 }

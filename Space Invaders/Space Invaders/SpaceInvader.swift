@@ -12,8 +12,8 @@ class SpaceInvader : SKSpriteNode {
     
     var points : Int = 0
     
-    
-    init(imageTexture: SKTexture) {
+    init(imageTexture: SKTexture, points: Int) {
+        self.points = points
         super.init(texture: imageTexture, color: UIColor.clear, size: imageTexture.size())
         self.physicsBody = SKPhysicsBody(rectangleOf: imageTexture.size())
         self.physicsBody?.isDynamic = true
