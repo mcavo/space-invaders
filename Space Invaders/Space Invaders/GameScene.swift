@@ -18,7 +18,7 @@ struct PhysicsCategory {
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    let spaceInvadersPerRow = 8
+    let kSpaceInvadersPerRow = 8
     // *****
     let motionManager = CMMotionManager()
     // *****
@@ -29,6 +29,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     let kInvaderVelocity = 10
     let kProjectileVelocity = 200
+    
+    var kSpaceInvadersCount : Int = -1
     
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black
@@ -51,6 +53,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateSpaceInvaders() {
+        if kSpaceInvadersCount == 0 {
+            addSpaceInvaders()
+        }
         self.enumerateChildNodes(withName: kSpaceInvaderName) {
             node, stop in
             if let invader = node as? SpaceInvader {
@@ -150,21 +155,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         populateRow(atlasName:"SpaceInvader_2", points: 20, row: 2)
         populateRow(atlasName:"SpaceInvader_2", points: 20, row: 3)
         populateRow(atlasName:"SpaceInvader_3", points: 30, row: 4)
+        kSpaceInvadersCount = 5 * kSpaceInvadersPerRow
     }
     
     func populateRow(atlasName: String, points: Int, row: Int) {
         
-        let delta = 0.75 * Double((spaceInvadersPerRow+1) % 2)
-        let percentage = -(ceil(Double(spaceInvadersPerRow)/2.0 - 1) * 1.5 + delta)
+        let delta = 0.75 * Double((kSpaceInvadersPerRow+1) % 2)
+        let percentage = -(ceil(Double(kSpaceInvadersPerRow)/2.0 - 1) * 1.5 + delta)
         
-        for inv in 0..<spaceInvadersPerRow {
+        for inv in 0..<kSpaceInvadersPerRow {
             let frames = getSKTextureArrayFromAtlasName(atlasName: atlasName)
             let deathFrames : [SKTexture] = [SKTexture(imageNamed: "InvaderExplotion")]
             let invader = SpaceInvader(initTexture: frames[0], movingTextures: frames, deathTextures: deathFrames, points: points)
             invader.size.width = 24.0
             invader.size.height = 16.0
             let positionX = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(inv)) * Double(invader.size.width))
-            let positionXMax = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(spaceInvadersPerRow - 1)) * Double(invader.size.width))
+            let positionXMax = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(kSpaceInvadersPerRow - 1)) * Double(invader.size.width))
             let positionXMin = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(0)) * Double(invader.size.width))
             let positionY = CGFloat(Double(size.height * 0.6) + Double(row) * 1.5 * Double(invader.size.height))
             invader.position = CGPoint(x: positionX, y: positionY)
@@ -179,9 +185,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             invader.physicsBody?.collisionBitMask = PhysicsCategory.None
             addChild(invader)
             invader.startMoveAction()
-            
         }
-        
     }
     
     func getSKTextureArrayFromAtlasName(atlasName: String) -> [SKTexture] {
@@ -229,6 +233,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func projectileDidCollideWithInvader(projectile: Projectile, invader: SpaceInvader) {
         kScore += invader.points
         projectile.removeFromParent()
+        invader.physicsBody?.categoryBitMask = PhysicsCategory.None
+        kSpaceInvadersCount -= 1
         invader.startDeathAction()
     }
     

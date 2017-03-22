@@ -26,13 +26,11 @@ class SpaceInvader : SKSpriteNode {
         self.points = points
         self.movingFrames = movingTextures
         self.deathFrames = deathTextures
-        print(initTexture.size().height)
         super.init(texture: initTexture, color: UIColor.clear, size: initTexture.size())
         self.physicsBody = SKPhysicsBody(rectangleOf: initTexture.size())
         self.physicsBody?.isDynamic = true
         self.physicsBody?.isResting = false
         self.physicsBody?.affectedByGravity = false
-        //self.physicsBody?.velocity = CGVector(dx: 8, dy: 0)
     }
     
     required init?(coder aDecoder: NSCoder) {
