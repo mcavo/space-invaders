@@ -8,16 +8,25 @@
 
 import SpriteKit
 
+struct Direction {
+    static let Right     : Int = 1
+    static let Left      : Int = -1
+}
+
 class SpaceInvader : SKSpriteNode {
     
-    var points : Int = 0
+    var points       : Int = 0
     var movingFrames : [SKTexture]
-    var deathFrames : [SKTexture]
+    var deathFrames  : [SKTexture]
+    var direction    : Int = Direction.Right
+    var limitLeft    : CGFloat = 0.0
+    var limitRigth   : CGFloat = 0.0
     
     init(initTexture: SKTexture, movingTextures: [SKTexture], deathTextures: [SKTexture], points: Int) {
         self.points = points
         self.movingFrames = movingTextures
         self.deathFrames = deathTextures
+        print(initTexture.size().height)
         super.init(texture: initTexture, color: UIColor.clear, size: initTexture.size())
         self.physicsBody = SKPhysicsBody(rectangleOf: initTexture.size())
         self.physicsBody?.isDynamic = true
@@ -34,7 +43,7 @@ class SpaceInvader : SKSpriteNode {
         self.run(SKAction.repeatForever(
             SKAction.animate(with: movingFrames,
                              timePerFrame: 0.1,
-                             resize: false,
+                             resize: true,
                              restore: true)),
                     withKey:"movingInvader")
     }
@@ -46,5 +55,13 @@ class SpaceInvader : SKSpriteNode {
         self.run(SKAction.sequence([actionShowExplotion, actionRemove]))
     }
     
+    func isOutsideLimits() -> Bool {
+        switch self.direction {
+        case Direction.Right:
+            return self.position.x > self.limitRigth
+        default:
+            return self.position.x < self.limitLeft
+        }
+    }
 
 }

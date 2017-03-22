@@ -27,6 +27,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kScoreName = "Score"
     var kScore : Int = 0
     
+    let kInvaderVelocity = 10
     let kProjectileVelocity = 200
     
     override func didMove(to view: SKView) {
@@ -44,8 +45,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         updateSpaceShipMotion(forUpdate: currentTime)
+        updateSpaceInvaders()
         updateProjectiles()
         updateScore()
+    }
+    
+    func updateSpaceInvaders() {
+        self.enumerateChildNodes(withName: kSpaceInvaderName) {
+            node, stop in
+            if let invader = node as? SpaceInvader {
+                //Check is inside bounds
+                if invader.isOutsideLimits() {
+                    invader.position.y -= invader.size.height
+                    invader.direction *= -1
+                }
+                //Update velocity
+                invader.physicsBody!.velocity = CGVector(dx: self.kInvaderVelocity * invader.direction, dy: 0)
+            }
+            
+        }
     }
     
     func updateProjectiles() {
@@ -143,10 +161,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let frames = getSKTextureArrayFromAtlasName(atlasName: atlasName)
             let deathFrames : [SKTexture] = [SKTexture(imageNamed: "InvaderExplotion")]
             let invader = SpaceInvader(initTexture: frames[0], movingTextures: frames, deathTextures: deathFrames, points: points)
+            invader.size.width = 24.0
+            invader.size.height = 16.0
             let positionX = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(inv)) * Double(invader.size.width))
+            let positionXMax = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(spaceInvadersPerRow - 1)) * Double(invader.size.width))
+            let positionXMin = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(0)) * Double(invader.size.width))
             let positionY = CGFloat(Double(size.height * 0.6) + Double(row) * 1.5 * Double(invader.size.height))
             invader.position = CGPoint(x: positionX, y: positionY)
             invader.name = kSpaceInvaderName
+            
+            invader.limitLeft = positionX - (positionXMin - invader.size.width)
+            invader.limitRigth = positionX + size.width - invader.size.width - positionXMax
+            
+            
             invader.physicsBody?.categoryBitMask = PhysicsCategory.Invader
             invader.physicsBody?.contactTestBitMask = PhysicsCategory.Projectile
             invader.physicsBody?.collisionBitMask = PhysicsCategory.None
