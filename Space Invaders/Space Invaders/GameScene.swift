@@ -34,16 +34,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.gravity = CGVector.zero
         physicsWorld.contactDelegate = self
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
+        addGameStatus()
         addSpaceInvaders()
         addSpaceShip()
         // *****
         motionManager.startAccelerometerUpdates()
         // *****
-        setupScore()
     }
     
     override func update(_ currentTime: TimeInterval) {
-        processSpaceShipMotion(forUpdate: currentTime)
+        updateSpaceShipMotion(forUpdate: currentTime)
         updateProjectiles()
         updateScore()
     }
@@ -58,7 +58,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
             }
         }
-        
         if let ship = childNode(withName: kShipName) as? SKSpriteNode {
             if let data = motionManager.accelerometerData {
                 if fabs(data.acceleration.x) > 0.2 {
@@ -76,6 +75,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 y: size.height - (40 + scoreLabel.frame.size.height/2)
             )
         }
+    }
+    
+    func addGameStatus() {
+        addScore()
+        addLifes()
+    }
+    
+    func addScore() {
+        let scoreLabel = SKLabelNode(fontNamed: "PressStartK")
+        scoreLabel.name = kScoreName
+        scoreLabel.fontSize = 12
+        scoreLabel.fontColor = SKColor.white
+        scoreLabel.text = String(format: "SCORE: %06u", kScore)
+        scoreLabel.position = CGPoint(
+            x: frame.size.width * 0.1 + scoreLabel.frame.size.width * 0.5,
+            y: size.height - (40 + scoreLabel.frame.size.height/2)
+        )
+        addChild(scoreLabel)
+    }
+    
+    // TODO: Show lifes
+    func addLifes() {
     }
     
     func addSpaceShip() {
@@ -120,7 +141,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         for inv in 0..<spaceInvadersPerRow {
             let frames = getSKTextureArrayFromAtlasName(atlasName: atlasName)
-            let invader = SpaceInvader(imageTexture: frames[0], points: points)
+            let deathFrames : [SKTexture] = [SKTexture(imageNamed: "InvaderExplotion")]
+            let invader = SpaceInvader(initTexture: frames[0], movingTextures: frames, deathTextures: deathFrames, points: points)
             let positionX = CGFloat(Double(size.width * 0.5) + (percentage + 1.5 * Double(inv)) * Double(invader.size.width))
             let positionY = CGFloat(Double(size.height * 0.6) + Double(row) * 1.5 * Double(invader.size.height))
             invader.position = CGPoint(x: positionX, y: positionY)
@@ -129,12 +151,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             invader.physicsBody?.contactTestBitMask = PhysicsCategory.Projectile
             invader.physicsBody?.collisionBitMask = PhysicsCategory.None
             addChild(invader)
-            invader.run(SKAction.repeatForever(
-                SKAction.animate(with: frames,
-                                             timePerFrame: 0.1,
-                                             resize: false,
-                                             restore: true)),
-                               withKey:"walkingInvader")
+            invader.startMoveAction()
+            
         }
         
     }
@@ -150,7 +168,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return kFrames
     }
     // *****
-    func processSpaceShipMotion(forUpdate currentTime: CFTimeInterval) {
+    func updateSpaceShipMotion(forUpdate currentTime: CFTimeInterval) {
         if let ship = childNode(withName: kShipName) as? Ship {
             if let data = motionManager.accelerometerData {
                 if fabs(data.acceleration.x) > 0.2 {
@@ -160,16 +178,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     // *****
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        addProjectile()
-    }
-    
-    func projectileDidCollideWithInvader(projectile: Projectile, invader: SpaceInvader) {
-        kScore += invader.points
-        projectile.removeFromParent()
-        invader.removeFromParent()
-    }
     
     func didBegin(_ contact: SKPhysicsContact) {
         var firstBody: SKPhysicsBody
@@ -191,18 +199,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    
-    func setupScore() {
-        let scoreLabel = SKLabelNode(fontNamed: "PressStartK")
-        scoreLabel.name = kScoreName
-        scoreLabel.fontSize = 12
-        scoreLabel.fontColor = SKColor.white
-        scoreLabel.text = String(format: "SCORE: %06u", kScore)
-        scoreLabel.position = CGPoint(
-            x: frame.size.width * 0.1 + scoreLabel.frame.size.width * 0.5,
-            y: size.height - (40 + scoreLabel.frame.size.height/2)
-        )
-        addChild(scoreLabel)
+    func projectileDidCollideWithInvader(projectile: Projectile, invader: SpaceInvader) {
+        kScore += invader.points
+        projectile.removeFromParent()
+        invader.startDeathAction()
     }
     
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        addProjectile()
+    }
 }
