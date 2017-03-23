@@ -30,7 +30,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kInvaderVelocity = 10
     let kProjectileVelocity = 200
     
-    var mapSpaceInvaders : [Int : SpaceInvader] = [:]
+    var mapSpaceInvaders : [Int : [Int : SpaceInvader]] = [:]
     var amountOfInvadersPerCol : [Int : Int] = [:]
     
     var percentage = 0.0
@@ -163,14 +163,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func addSpaceInvaders() {
+        for i in 0..<kSpaceInvadersPerRow {
+            amountOfInvadersPerCol[i] = 5
+            mapSpaceInvaders[i] = [:]
+        }
         populateRow(atlasName:"SpaceInvader_1", points: 10, row: 0)
         populateRow(atlasName:"SpaceInvader_1", points: 10, row: 1)
         populateRow(atlasName:"SpaceInvader_2", points: 20, row: 2)
         populateRow(atlasName:"SpaceInvader_2", points: 20, row: 3)
         populateRow(atlasName:"SpaceInvader_3", points: 30, row: 4)
-        for i in 0..<kSpaceInvadersPerRow {
-            amountOfInvadersPerCol[i] = 5
-        }
+        
     }
     
     func populateRow(atlasName: String, points: Int, row: Int) {
@@ -199,7 +201,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             invader.physicsBody?.collisionBitMask = PhysicsCategory.None
             invader.physicsBody?.velocity = CGVector(dx: self.kInvaderVelocity * invader.direction, dy: 0)
             addChild(invader)
-            mapSpaceInvaders[row*kSpaceInvadersPerRow + inv] = invader
+            mapSpaceInvaders[invader.col]?[invader.row] = invader
             invader.startMoveAction()
         }
     }
@@ -256,7 +258,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         else {
             amountOfInvadersPerCol[invader.col]! -= 1
         }
-        mapSpaceInvaders.removeValue(forKey: invader.col + invader.row * kSpaceInvadersPerRow)
+        mapSpaceInvaders[invader.col]?.removeValue(forKey: invader.row)
+        if (mapSpaceInvaders[invader.col]?.isEmpty)! {
+            mapSpaceInvaders.removeValue(forKey: invader.col)
+        }
         invader.startDeathAction()
     }
     
