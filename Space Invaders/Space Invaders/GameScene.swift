@@ -30,13 +30,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kInvaderVelocity = 10
     let kProjectileVelocity = 200
     
-    var kSpaceInvadersCount : Int = -1
+    var mapSpaceInvaders : [Int : SpaceInvader] = [:]
+    var amountOfInvadersPerCol : [Int : Int] = [:]
+    
+    var percentage = 0.0
     
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black
         physicsWorld.gravity = CGVector.zero
         physicsWorld.contactDelegate = self
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
+        let delta = 0.75 * Double((kSpaceInvadersPerRow+1) % 2)
+        percentage = -(ceil(Double(kSpaceInvadersPerRow)/2.0 - 1) * 1.5 + delta)
         addGameStatus()
         addSpaceInvaders()
         addSpaceShip()
@@ -53,19 +58,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateSpaceInvaders() {
-        if kSpaceInvadersCount == 0 {
+        if mapSpaceInvaders.isEmpty {
             addSpaceInvaders()
         }
         self.enumerateChildNodes(withName: kSpaceInvaderName) {
             node, stop in
             if let invader = node as? SpaceInvader {
+                let maxRow = self.amountOfInvadersPerCol.keys.max()
+                let minRow = self.amountOfInvadersPerCol.keys.min()
+                let positionX = CGFloat(Double(self.size.width * 0.5) + (self.percentage + 1.5 * Double(invader.col)) * Double(invader.size.width))
+                let positionXMax = CGFloat(Double(self.size.width * 0.5) + (self.percentage + 1.5 * Double(maxRow!)) * Double(invader.size.width))
+                let positionXMin = CGFloat(Double(self.size.width * 0.5) + (self.percentage + 1.5 * Double(minRow!)) * Double(invader.size.width))
+                
+                invader.limitLeft = positionX - (positionXMin - invader.size.width)
+                invader.limitRigth = positionX + self.size.width - invader.size.width - positionXMax
                 //Check is inside bounds
                 if invader.isOutsideLimits() {
                     invader.position.y -= invader.size.height
                     invader.direction *= -1
+                    //Update velocity
+                    invader.physicsBody!.velocity = CGVector(dx: self.kInvaderVelocity * invader.direction, dy: 0)
                 }
-                //Update velocity
-                invader.physicsBody!.velocity = CGVector(dx: self.kInvaderVelocity * invader.direction, dy: 0)
             }
             
         }
@@ -155,13 +168,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         populateRow(atlasName:"SpaceInvader_2", points: 20, row: 2)
         populateRow(atlasName:"SpaceInvader_2", points: 20, row: 3)
         populateRow(atlasName:"SpaceInvader_3", points: 30, row: 4)
-        kSpaceInvadersCount = 5 * kSpaceInvadersPerRow
+        for i in 0..<kSpaceInvadersPerRow {
+            amountOfInvadersPerCol[i] = 5
+        }
     }
     
     func populateRow(atlasName: String, points: Int, row: Int) {
-        
-        let delta = 0.75 * Double((kSpaceInvadersPerRow+1) % 2)
-        let percentage = -(ceil(Double(kSpaceInvadersPerRow)/2.0 - 1) * 1.5 + delta)
         
         for inv in 0..<kSpaceInvadersPerRow {
             let frames = getSKTextureArrayFromAtlasName(atlasName: atlasName)
@@ -179,11 +191,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             invader.limitLeft = positionX - (positionXMin - invader.size.width)
             invader.limitRigth = positionX + size.width - invader.size.width - positionXMax
             
+            invader.col = inv
+            invader.row = row
             
             invader.physicsBody?.categoryBitMask = PhysicsCategory.Invader
             invader.physicsBody?.contactTestBitMask = PhysicsCategory.Projectile
             invader.physicsBody?.collisionBitMask = PhysicsCategory.None
+            invader.physicsBody?.velocity = CGVector(dx: self.kInvaderVelocity * invader.direction, dy: 0)
             addChild(invader)
+            mapSpaceInvaders[row*kSpaceInvadersPerRow + inv] = invader
             invader.startMoveAction()
         }
     }
@@ -234,7 +250,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         kScore += invader.points
         projectile.removeFromParent()
         invader.physicsBody?.categoryBitMask = PhysicsCategory.None
-        kSpaceInvadersCount -= 1
+        if amountOfInvadersPerCol[invader.col]! == 1 {
+            amountOfInvadersPerCol.removeValue(forKey: invader.col)
+        }
+        else {
+            amountOfInvadersPerCol[invader.col]! -= 1
+        }
+        mapSpaceInvaders.removeValue(forKey: invader.col + invader.row * kSpaceInvadersPerRow)
         invader.startDeathAction()
     }
     

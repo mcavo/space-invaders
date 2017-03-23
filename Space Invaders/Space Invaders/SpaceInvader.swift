@@ -22,6 +22,9 @@ class SpaceInvader : SKSpriteNode {
     var limitLeft    : CGFloat = 0.0
     var limitRigth   : CGFloat = 0.0
     
+    var row          : Int = 0
+    var col          : Int = 0
+    
     init(initTexture: SKTexture, movingTextures: [SKTexture], deathTextures: [SKTexture], points: Int) {
         self.points = points
         self.movingFrames = movingTextures
@@ -31,6 +34,8 @@ class SpaceInvader : SKSpriteNode {
         self.physicsBody?.isDynamic = true
         self.physicsBody?.isResting = false
         self.physicsBody?.affectedByGravity = false
+        self.physicsBody?.linearDamping = 0.0
+        self.physicsBody?.angularDamping = 0.0
     }
     
     required init?(coder aDecoder: NSCoder) {
