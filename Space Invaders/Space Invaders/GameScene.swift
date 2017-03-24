@@ -14,7 +14,8 @@ struct PhysicsCategory {
     static let None      : UInt32 = 0
     static let All       : UInt32 = UInt32.max
     static let Invader   : UInt32 = 0b1       // 1
-    static let Projectile: UInt32 = 0b10      // 2
+    static let SpaceShip : UInt32 = 0b10      // 2
+    static let Projectile: UInt32 = 0b11      // 3
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -24,6 +25,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // *****
     let kShipName = "SpaceShip"
     let kSpaceInvaderName = "SpaceInvader"
+    let kSpaceInvaderProjectileName = "SpaceInvaderProjectile"
     let kScoreName = "Score"
     var kScore : Int = 0
     
@@ -34,6 +36,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var amountOfInvadersPerCol : [Int : Int] = [:]
     
     var percentage = 0.0
+    
+    var spaceInvaderBulletAtScene : Bool = false
     
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.black
@@ -80,15 +84,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     invader.physicsBody!.velocity = CGVector(dx: self.kInvaderVelocity * invader.direction, dy: 0)
                 }
             }
-            
         }
+        if !spaceInvaderBulletAtScene {
+            
+            spaceInvaderBulletAtScene = true
+            let colToShoot = Int(arc4random_uniform(UInt32(mapSpaceInvaders.keys.count)))
+            let rowToShoot = mapSpaceInvaders[colToShoot]?.keys.min()
+
+            addSpaceInvaderProjectile(invader: (mapSpaceInvaders[colToShoot]?[rowToShoot!])!)
+        }
+        
     }
     
     func updateProjectiles() {
         self.enumerateChildNodes(withName: "Projectile") {
             node, stop in
             if let projectile = node as? Projectile {
-                projectile.physicsBody!.velocity = CGVector(dx: 0, dy: self.kProjectileVelocity * projectile.direction)
+                //projectile.physicsBody!.velocity = CGVector(dx: 0, dy: self.kProjectileVelocity * projectile.direction)
                 if projectile.position.y > self.size.height - 2 * projectile.frame.size.height {
                     projectile.removeFromParent()
                 }
@@ -149,10 +161,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(ship)
     }
     
-    func addProjectile() {
+    func addProjectile(imageNamed: String, direction : Int, shooter : SKNode) -> Projectile {
+        let projectile = Projectile(imageNamed: imageNamed, direction: direction)
+        var positionY : CGFloat = shooter.position.y
+        positionY += CGFloat(direction) * shooter.frame.size.height * 0.5
+        positionY += CGFloat(direction) * projectile.size.height
+        projectile.position = CGPoint(x: shooter.position.x, y: positionY)
+        projectile.physicsBody!.velocity = CGVector(dx: 0, dy: self.kProjectileVelocity * projectile.direction)
+        return projectile
+    }
+    
+    func addSpaceShipProjectile() {
         if let ship = childNode(withName: kShipName) {
-            let projectile = Projectile(imageNamed: "Projectile", direction: 1)
-            projectile.position = CGPoint(x: ship.position.x, y: ship.position.y + ship.frame.size.height * 0.5 + projectile.size.height)
+            let projectile = addProjectile(imageNamed: "Projectile", direction: 1, shooter: ship)
             projectile.name = "Projectile"
             projectile.physicsBody?.categoryBitMask = PhysicsCategory.Projectile
             projectile.physicsBody?.contactTestBitMask = PhysicsCategory.Invader
@@ -160,6 +181,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             projectile.physicsBody?.usesPreciseCollisionDetection = true
             addChild(projectile)
         }
+    }
+    
+    func addSpaceInvaderProjectile(invader : SpaceInvader) {
+        let projectile = addProjectile(imageNamed: "InvaderProjectile", direction: -1, shooter: invader)
+        projectile.name = kSpaceInvaderProjectileName
+        projectile.physicsBody?.categoryBitMask = PhysicsCategory.Projectile
+        projectile.physicsBody?.contactTestBitMask = PhysicsCategory.SpaceShip
+        projectile.physicsBody?.collisionBitMask = PhysicsCategory.None
+        projectile.physicsBody?.usesPreciseCollisionDetection = true
+        addChild(projectile)
     }
     
     func addSpaceInvaders() {
@@ -266,6 +297,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        addProjectile()
+        addSpaceShipProjectile()
     }
 }

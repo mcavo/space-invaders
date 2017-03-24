@@ -20,6 +20,8 @@ class Projectile : SKSpriteNode {
         self.physicsBody?.isDynamic = true
         self.physicsBody?.isResting = false
         self.physicsBody?.affectedByGravity = false
+        self.physicsBody?.linearDamping = 0.0
+        self.physicsBody?.angularDamping = 0.0
     }
     
     required init?(coder aDecoder: NSCoder) {
