@@ -16,6 +16,15 @@ struct PhysicsCategory {
     static let Invader   : UInt32 = 0b1       // 1
     static let SpaceShip : UInt32 = 0b10      // 2
     static let Projectile: UInt32 = 0b11      // 3
+    static let SceneEdge : UInt32 = 0b100     // 4
+    
+    let kInvaderCategory: UInt32 = 0x1 << 0
+    let kShipFiredBulletCategory: UInt32 = 0x1 << 1
+    let kShipCategory: UInt32 = 0x1 << 2
+    let kSceneEdgeCategory: UInt32 = 0x1 << 3
+    let kInvaderFiredBulletCategory: UInt32 = 0x1 << 4
+    
+    
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -26,6 +35,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kShipName = "SpaceShip"
     let kSpaceInvaderName = "SpaceInvader"
     let kSpaceInvaderProjectileName = "SpaceInvaderProjectile"
+    let kSpaceShipProjectileName = "SpaceShipProjectile"
     let kScoreName = "Score"
     var kScore : Int = 0
     
@@ -46,12 +56,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
         let delta = 0.75 * Double((kSpaceInvadersPerRow+1) % 2)
         percentage = -(ceil(Double(kSpaceInvadersPerRow)/2.0 - 1) * 1.5 + delta)
+        physicsBody!.categoryBitMask = PhysicsCategory.SceneEdge
         addGameStatus()
         addSpaceInvaders()
         addSpaceShip()
         // *****
         motionManager.startAccelerometerUpdates()
         // *****
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -97,15 +109,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateProjectiles() {
-        self.enumerateChildNodes(withName: "Projectile") {
+        self.enumerateChildNodes(withName: kSpaceShipProjectileName) {
             node, stop in
             if let projectile = node as? Projectile {
-                //projectile.physicsBody!.velocity = CGVector(dx: 0, dy: self.kProjectileVelocity * projectile.direction)
                 if projectile.position.y > self.size.height - 2 * projectile.frame.size.height {
                     projectile.removeFromParent()
                 }
             }
         }
+        if spaceInvaderBulletAtScene {
+            if let projectile = childNode(withName: kSpaceInvaderProjectileName) as? SKSpriteNode {
+                if projectile.position.y <  2 * projectile.frame.size.height {
+                    spaceInvaderBulletAtScene = false
+                    projectile.removeFromParent()
+                }
+            }
+        }
+        
         if let ship = childNode(withName: kShipName) as? SKSpriteNode {
             if let data = motionManager.accelerometerData {
                 if fabs(data.acceleration.x) > 0.2 {
@@ -148,8 +168,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func addSpaceShip() {
-        let ship = Ship(imageNamed: "SpaceShip")
-        ship.position = CGPoint(x: size.width * 0.5, y: size.height * 0.1)
+        let ship = Ship(imageNamed: "SpaceShip", start: CGPoint(x: size.width * 0.5, y: size.height * 0.1))
         ship.name = kShipName
         // *****
         ship.physicsBody = SKPhysicsBody(rectangleOf: ship.frame.size)
@@ -157,7 +176,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ship.physicsBody!.affectedByGravity = false
         ship.physicsBody!.mass = 0.01
         ship.physicsBody!.allowsRotation = false
-        // *****
+        ship.physicsBody!.categoryBitMask = PhysicsCategory.SpaceShip
+        ship.physicsBody!.contactTestBitMask = 0x0
+        ship.physicsBody!.collisionBitMask = PhysicsCategory.SceneEdge
         addChild(ship)
     }
     
@@ -174,12 +195,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func addSpaceShipProjectile() {
         if let ship = childNode(withName: kShipName) {
             let projectile = addProjectile(imageNamed: "Projectile", direction: 1, shooter: ship)
-            projectile.name = "Projectile"
+            projectile.name = kSpaceShipProjectileName
             projectile.physicsBody?.categoryBitMask = PhysicsCategory.Projectile
             projectile.physicsBody?.contactTestBitMask = PhysicsCategory.Invader
             projectile.physicsBody?.collisionBitMask = PhysicsCategory.None
             projectile.physicsBody?.usesPreciseCollisionDetection = true
             addChild(projectile)
+            run(SKAction.playSoundFileNamed("ShipBullet.wav", waitForCompletion: false))
         }
     }
     
@@ -191,6 +213,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         projectile.physicsBody?.collisionBitMask = PhysicsCategory.None
         projectile.physicsBody?.usesPreciseCollisionDetection = true
         addChild(projectile)
+        run(SKAction.playSoundFileNamed("ShipBullet.wav", waitForCompletion: false))
     }
     
     func addSpaceInvaders() {
@@ -275,8 +298,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 projectile = secondBody.node as? Projectile {
                 projectileDidCollideWithInvader(projectile: projectile, invader: invader)
             }
+        } else if ((firstBody.categoryBitMask & PhysicsCategory.SpaceShip != 0) &&
+            (secondBody.categoryBitMask & PhysicsCategory.Projectile != 0)) {
+            if let ship = firstBody.node as? Ship, let
+                projectile = secondBody.node as? Projectile {
+                projectileDidCollideWithSpaceShip(projectile: projectile, ship: ship)
+            }
         }
         
+    }
+    
+    func projectileDidCollideWithSpaceShip(projectile: Projectile, ship: Ship) {
+        projectile.removeFromParent()
+        spaceInvaderBulletAtScene = false
+        ship.startDeathAction()
     }
     
     func projectileDidCollideWithInvader(projectile: Projectile, invader: SpaceInvader) {
@@ -289,7 +324,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         else {
             amountOfInvadersPerCol[invader.col]! -= 1
         }
-        mapSpaceInvaders[invader.col]?.removeValue(forKey: invader.row)
+        mapSpaceInvaders[invader.col]!.removeValue(forKey: invader.row)
         if (mapSpaceInvaders[invader.col]?.isEmpty)! {
             mapSpaceInvaders.removeValue(forKey: invader.col)
         }

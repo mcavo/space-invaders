@@ -19,6 +19,10 @@
 		38BC065D1E7BABC800385F77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38BC065C1E7BABC800385F77 /* Assets.xcassets */; };
 		38BC06601E7BABC800385F77 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38BC065E1E7BABC800385F77 /* LaunchScreen.storyboard */; };
 		38BC06681E7C0D9900385F77 /* SpaceInvader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BC06671E7C0D9900385F77 /* SpaceInvader.swift */; };
+		38FDAB801E8D57FA006092A8 /* InvaderBullet.wav in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAB7C1E8D57FA006092A8 /* InvaderBullet.wav */; };
+		38FDAB811E8D57FA006092A8 /* InvaderHit.wav in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAB7D1E8D57FA006092A8 /* InvaderHit.wav */; };
+		38FDAB821E8D57FA006092A8 /* ShipBullet.wav in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAB7E1E8D57FA006092A8 /* ShipBullet.wav */; };
+		38FDAB831E8D57FA006092A8 /* ShipHit.wav in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAB7F1E8D57FA006092A8 /* ShipHit.wav */; };
 		38FDAC481E7F76A700D85EA2 /* SpaceInvader_1.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAC471E7F76A700D85EA2 /* SpaceInvader_1.atlas */; };
 		38FDAC4C1E7F76D400D85EA2 /* SpaceInvader_3.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 38FDAC4B1E7F76D400D85EA2 /* SpaceInvader_3.atlas */; };
 /* End PBXBuildFile section */
@@ -38,6 +42,10 @@
 		38BC065F1E7BABC800385F77 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		38BC06611E7BABC800385F77 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		38BC06671E7C0D9900385F77 /* SpaceInvader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceInvader.swift; sourceTree = "<group>"; };
+		38FDAB7C1E8D57FA006092A8 /* InvaderBullet.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = InvaderBullet.wav; sourceTree = "<group>"; };
+		38FDAB7D1E8D57FA006092A8 /* InvaderHit.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = InvaderHit.wav; sourceTree = "<group>"; };
+		38FDAB7E1E8D57FA006092A8 /* ShipBullet.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ShipBullet.wav; sourceTree = "<group>"; };
+		38FDAB7F1E8D57FA006092A8 /* ShipHit.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ShipHit.wav; sourceTree = "<group>"; };
 		38FDAC471E7F76A700D85EA2 /* SpaceInvader_1.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = SpaceInvader_1.atlas; sourceTree = "<group>"; };
 		38FDAC4B1E7F76D400D85EA2 /* SpaceInvader_3.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = SpaceInvader_3.atlas; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,6 +86,7 @@
 				3875EE0E1E81DAD0005F3A60 /* prstartk.ttf */,
 				38BC06571E7BABC800385F77 /* GameViewController.swift */,
 				38BC06591E7BABC800385F77 /* Main.storyboard */,
+				38FDAB7B1E8D57FA006092A8 /* Sounds */,
 				38BC065C1E7BABC800385F77 /* Assets.xcassets */,
 				38716CDB1E83014400906300 /* SpaceInvader_2.atlas */,
 				38FDAC4B1E7F76D400D85EA2 /* SpaceInvader_3.atlas */,
@@ -89,6 +98,17 @@
 				3844FAB01E819D0200D67ABB /* Projectile.swift */,
 			);
 			path = "Space Invaders";
+			sourceTree = "<group>";
+		};
+		38FDAB7B1E8D57FA006092A8 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				38FDAB7C1E8D57FA006092A8 /* InvaderBullet.wav */,
+				38FDAB7D1E8D57FA006092A8 /* InvaderHit.wav */,
+				38FDAB7E1E8D57FA006092A8 /* ShipBullet.wav */,
+				38FDAB7F1E8D57FA006092A8 /* ShipHit.wav */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,7 +176,11 @@
 				38716CDC1E83014400906300 /* SpaceInvader_2.atlas in Resources */,
 				38BC065D1E7BABC800385F77 /* Assets.xcassets in Resources */,
 				38FDAC4C1E7F76D400D85EA2 /* SpaceInvader_3.atlas in Resources */,
+				38FDAB811E8D57FA006092A8 /* InvaderHit.wav in Resources */,
+				38FDAB821E8D57FA006092A8 /* ShipBullet.wav in Resources */,
+				38FDAB831E8D57FA006092A8 /* ShipHit.wav in Resources */,
 				38BC06601E7BABC800385F77 /* LaunchScreen.storyboard in Resources */,
+				38FDAB801E8D57FA006092A8 /* InvaderBullet.wav in Resources */,
 				3875EE0F1E81DAD0005F3A60 /* prstartk.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

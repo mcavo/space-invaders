@@ -54,8 +54,10 @@ class SpaceInvader : SKSpriteNode {
     func startDeathAction() {
         self.removeAction(forKey: "movingInvader")
         let actionShowExplotion = SKAction.animate(with: deathFrames, timePerFrame: 0.2)
+        let actionSoundExplotion = SKAction.playSoundFileNamed("InvaderHit.wav", waitForCompletion: false)
         let actionRemove = SKAction.removeFromParent()
-        self.run(SKAction.sequence([actionShowExplotion, actionRemove]))
+        let actionExplotion = SKAction.group([actionShowExplotion, actionSoundExplotion])
+        self.run(SKAction.sequence([actionExplotion, actionRemove]))
     }
     
     func isOutsideLimits() -> Bool {
