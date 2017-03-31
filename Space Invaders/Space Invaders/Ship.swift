@@ -10,8 +10,6 @@ import SpriteKit
 
 class Ship: SKSpriteNode {
     
-    var lives        : Int = 3
-    
     var deathFrames  : [SKTexture] = [SKTexture(imageNamed: "SpaceShipExplotion")]
     var idleFrames   : [SKTexture] = []
     
@@ -34,19 +32,13 @@ class Ship: SKSpriteNode {
     }
 
     func startDeathAction() {
-        lives -= 1
         self.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         let actionShowExplotion = SKAction.animate(with: deathFrames, timePerFrame: 0.2)
         let actionSoundExplotion = SKAction.playSoundFileNamed("ShipHit.wav", waitForCompletion: false)
         let actionExplotion = SKAction.group([actionShowExplotion, actionSoundExplotion])
-        if lives == 0 {
-            let actionRemove = SKAction.removeFromParent()
-            self.run(SKAction.sequence([actionExplotion, actionRemove]))
-        } else {
-            let actionRestartPosition = SKAction.move(to: start, duration: 0)
-            let actionRestartLook = SKAction.animate(with: idleFrames, timePerFrame: 0.1)
-            self.run(SKAction.sequence([actionExplotion, actionRestartPosition, actionRestartLook]))
-        }
+        let actionRestartPosition = SKAction.move(to: start, duration: 0)
+        let actionRestartLook = SKAction.animate(with: idleFrames, timePerFrame: 0.1)
+        self.run(SKAction.sequence([actionExplotion, actionRestartPosition, actionRestartLook]))
     }
     
 }

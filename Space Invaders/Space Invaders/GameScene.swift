@@ -37,7 +37,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let kSpaceInvaderProjectileName = "SpaceInvaderProjectile"
     let kSpaceShipProjectileName = "SpaceShipProjectile"
     let kScoreName = "Score"
-    var kScore : Int = 0
+    var score : Int = 0
+    let kLifesName = "Lifes"
+    var lifes : Int = 3
     
     let kInvaderVelocity = 10
     let kProjectileVelocity = 200
@@ -71,10 +73,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         updateSpaceInvaders()
         updateProjectiles()
         updateScore()
+        updateLifes()
     }
     
     func updateSpaceInvaders() {
         if mapSpaceInvaders.isEmpty {
+            lifes += 1
             addSpaceInvaders()
         }
         self.enumerateChildNodes(withName: kSpaceInvaderName) {
@@ -100,7 +104,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if !spaceInvaderBulletAtScene {
             
             spaceInvaderBulletAtScene = true
-            let colToShoot = Int(arc4random_uniform(UInt32(mapSpaceInvaders.keys.count)))
+            let colKeyIndex = Int(arc4random_uniform(UInt32(mapSpaceInvaders.keys.count)))
+            let colToShoot = Array(mapSpaceInvaders.keys)[colKeyIndex]
             let rowToShoot = mapSpaceInvaders[colToShoot]?.keys.min()
 
             addSpaceInvaderProjectile(invader: (mapSpaceInvaders[colToShoot]?[rowToShoot!])!)
@@ -137,11 +142,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func updateScore() {
         if let scoreLabel = childNode(withName: kScoreName) as? SKLabelNode {
-            scoreLabel.text = String(format: "SCORE: %06u", kScore)
+            scoreLabel.text = String(format: "SCORE: %06u", score)
             scoreLabel.position = CGPoint(
                 x: frame.size.width * 0.1 + scoreLabel.frame.size.width * 0.5,
-                y: size.height - (40 + scoreLabel.frame.size.height/2)
+                y: size.height - (4 * scoreLabel.frame.size.height)
             )
+        }
+    }
+    
+    func updateLifes() {
+        if let lifesLabel = childNode(withName: kLifesName) as? SKLabelNode {
+            lifesLabel.text = String(format: "X %u", lifes)
         }
     }
     
@@ -155,16 +166,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.name = kScoreName
         scoreLabel.fontSize = 12
         scoreLabel.fontColor = SKColor.white
-        scoreLabel.text = String(format: "SCORE: %06u", kScore)
+        scoreLabel.text = String(format: "SCORE: %06u", score)
         scoreLabel.position = CGPoint(
             x: frame.size.width * 0.1 + scoreLabel.frame.size.width * 0.5,
-            y: size.height - (40 + scoreLabel.frame.size.height/2)
+            y: size.height - (4 * scoreLabel.frame.size.height)
         )
         addChild(scoreLabel)
     }
     
-    // TODO: Show lifes
     func addLifes() {
+        let lifesLabel = SKLabelNode(fontNamed: "PressStartK")
+        lifesLabel.name = kLifesName
+        lifesLabel.fontSize = 12
+        lifesLabel.fontColor = SKColor.white
+        lifesLabel.text = String(format: "X%u", lifes)
+        lifesLabel.position = CGPoint(
+            x: frame.size.width * 0.9 - lifesLabel.frame.size.width * 0.5,
+            y: size.height - (4 * lifesLabel.frame.size.height)
+        )
+        addChild(lifesLabel)
+        
+        let spaceship = SKSpriteNode(imageNamed: "SpaceShip")
+        spaceship.size.height = 10
+        spaceship.size.width = 18.75
+        spaceship.position.x = lifesLabel.position.x - lifesLabel.frame.size.width - spaceship.size.width
+        spaceship.position.y = size.height - (3.5 * lifesLabel.frame.size.height)
+        addChild(spaceship)
     }
     
     func addSpaceShip() {
@@ -311,24 +338,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func projectileDidCollideWithSpaceShip(projectile: Projectile, ship: Ship) {
         projectile.removeFromParent()
         spaceInvaderBulletAtScene = false
+        self.lifes -= 1
         ship.startDeathAction()
     }
     
     func projectileDidCollideWithInvader(projectile: Projectile, invader: SpaceInvader) {
-        kScore += invader.points
-        projectile.removeFromParent()
-        invader.physicsBody?.categoryBitMask = PhysicsCategory.None
+        mapSpaceInvaders[invader.col]!.removeValue(forKey: invader.row)
+        if (mapSpaceInvaders[invader.col]?.isEmpty)! {
+            mapSpaceInvaders.removeValue(forKey: invader.col)
+        }
         if amountOfInvadersPerCol[invader.col]! == 1 {
             amountOfInvadersPerCol.removeValue(forKey: invader.col)
         }
         else {
             amountOfInvadersPerCol[invader.col]! -= 1
         }
-        mapSpaceInvaders[invader.col]!.removeValue(forKey: invader.row)
-        if (mapSpaceInvaders[invader.col]?.isEmpty)! {
-            mapSpaceInvaders.removeValue(forKey: invader.col)
-        }
         invader.startDeathAction()
+        score += invader.points
+        projectile.removeFromParent()
+        invader.physicsBody?.categoryBitMask = PhysicsCategory.None
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
